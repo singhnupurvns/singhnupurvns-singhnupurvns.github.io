@@ -60,6 +60,43 @@
     border-color: rgba(255,255,255,0.6);
   }
 
+  /* ---------- CLICK-TO-PLAY OVERLAY ---------- */
+  #start-overlay{
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.55);
+    cursor: pointer;
+    transition: opacity 0.4s ease;
+  }
+  #start-overlay.hidden{
+    opacity: 0;
+    pointer-events: none;
+  }
+  #start-overlay .play-pill{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.95);
+    color: #0b1220;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.5);
+  }
+  #start-overlay .play-icon{
+    width: 0;
+    height: 0;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-left: 14px solid #0b1220;
+  }
+
   /* ---------- MAIN PORTFOLIO STAGE ---------- */
   #portfolio{
     position: relative;
@@ -137,9 +174,15 @@
 
   <!-- Intro video stage -->
   <div id="intro">
-    <video id="intro-video" autoplay muted playsinline>
+    <video id="intro-video" playsinline>
       <source src="video.mp4" type="video/mp4">
     </video>
+    <div id="start-overlay">
+      <div class="play-pill">
+        <span class="play-icon"></span>
+        <span>Tap to play with sound</span>
+      </div>
+    </div>
     <button id="skip-btn">Skip intro →</button>
   </div>
 
@@ -161,6 +204,7 @@
   const portfolioEl = document.getElementById('portfolio');
   const video = document.getElementById('intro-video');
   const skipBtn = document.getElementById('skip-btn');
+  const startOverlay = document.getElementById('start-overlay');
 
   function revealPortfolio(){
     introEl.classList.add('fade-out');
@@ -168,12 +212,32 @@
     setTimeout(() => { introEl.style.display = 'none'; }, 950);
   }
 
-  video.addEventListener('ended', revealPortfolio);
-  skipBtn.addEventListener('click', revealPortfolio);
+  function startVideo(){
+    video.muted = false;
+    video.volume = 1;
+    video.play();
+    startOverlay.classList.add('hidden');
+  }
 
-  // Fallback in case autoplay is blocked: show portfolio after a short wait
+  startOverlay.addEventListener('click', startVideo);
+
+  video.addEventListener('ended', revealPortfolio);
+  skipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    revealPortfolio();
+  });
+
+  // Fallback in case something goes wrong loading the video
   video.addEventListener('error', revealPortfolio);
 </script>
 
 </body>
 </html>
+
+
+
+
+ 
+
+
+
